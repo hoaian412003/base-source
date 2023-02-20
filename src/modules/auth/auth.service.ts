@@ -2,10 +2,9 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { JwtSecret } from "src/config/environment";
 import { Messages } from "src/config/messages";
-import { User, UserDocument } from "src/user/user.schema";
 import { comparePassword } from "src/utils/bcrypt";
+import { User, UserDocument } from "../user/user.schema";
 import { Auth, AuthDocument } from "./auth.schema";
 import { LoginDto } from "./dto/login.dto";
 

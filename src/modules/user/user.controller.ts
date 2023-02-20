@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Request } from "@nestjs/common";
-import { LoginDto } from "src/auth/dto/login.dto";
 import { Role } from "src/config/role";
 import { Roles } from "src/decorator/role.decorator";
 import { CreateUserDto } from "./dto/create-user.dto";
