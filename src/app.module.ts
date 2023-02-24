@@ -6,7 +6,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { getMongoUrl } from './config/environment';
 import { RolesGuard } from './guard/role.guard';
-import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -20,12 +19,11 @@ import { UserModule } from './modules/user/user.module';
     // Config mongoose
     MongooseModule.forRoot(getMongoUrl()),
 
-    // Config passport
+    // Config Passport, Jwt
     PassportModule,
     JwtModule,
 
     // Another module
-    AuthModule,
     UserModule
   ],
   controllers: [],

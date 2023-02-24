@@ -1,30 +1,15 @@
-import { Body, Controller, Get, Post, Request } from "@nestjs/common";
-import { Role } from "src/config/role";
-import { Roles } from "src/decorator/role.decorator";
+import { Controller } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
+import { BaseController } from "src/base/controller";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { LoginUserDto } from "./dto/login-user.dto";
+import { User } from "./user.schema";
 import { UserService } from "./user.service";
 
-@Controller('users')
-export class UserController {
+@Controller('user')
+@ApiTags('User')
+export class UserController extends BaseController<CreateUserDto>('user', CreateUserDto) {
 
   constructor(private userService: UserService) {
-
-  }
-
-  @Post()
-  async create(@Body() data: CreateUserDto) {
-    return await this.userService.create(data);
-  }
-
-  @Post('/login')
-  async login(@Body() data: LoginUserDto) {
-    return await this.userService.login(data);
-  }
-
-  @Get('/me')
-  @Roles(Role.USER)
-  async getMe(@Request() request) {
-    return request.person;
+    super(userService as any);
   }
 }
