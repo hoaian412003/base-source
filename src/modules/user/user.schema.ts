@@ -1,20 +1,22 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString } from "class-validator";
-import { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
+import { BaseSchema, DefaultSchema } from "src/base/schema";
+import { Role } from "../role/role.schema";
 
 export type UserDocument = HydratedDocument<User>
 
-@Schema()
-export class User {
+@DefaultSchema()
+export class User extends BaseSchema {
 
-  @ApiProperty({
-    name: 'role',
-    required: true
+  @Prop({
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+    ref: Role.name,
+    autopopulate: true
   })
-  @IsString()
-  @Prop()
-  role: string;
+  roles: Array<Role>;
 
   @ApiProperty({
     name: 'username',

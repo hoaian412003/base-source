@@ -1,37 +1,33 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { SchemaOptions } from "mongoose";
+import { applyDecorators } from "@nestjs/common";
+import { Prop, Schema } from "@nestjs/mongoose";
 
-export const BaseSchema = (options?: SchemaOptions) => {
-  return <T extends { new(...args: any[]): {} }>(Class: T) => {
-    @Schema({
-      timestamps: true,
-      toJSON: {
-        getters: true,
-      },
-      toObject: {
-        getters: true
-      },
-      ...options
-    })
-    class SchemaClass extends Class {
+export const DefaultSchema = () => {
+  return applyDecorators(Schema({
+    timestamps: true,
+    toJSON: {
+      getters: true,
+    },
+    toObject: {
+      getters: true
+    },
+  }))
+}
 
-      @Prop({
-        default: false
-      })
-      isDeleted: boolean
+export class BaseSchema {
+  @Prop({
+    default: false
+  })
+  isDeleted: boolean
 
-      @Prop({
-        required: false,
-        default: 'null'
-      })
-      createdBy: string;
+  @Prop({
+    required: false,
+    default: 'null'
+  })
+  createdBy: string;
 
-      @Prop({
-        required: false,
-        default: 'null'
-      })
-      updatedBy: string;
-    }
-    return SchemaClass;
-  }
+  @Prop({
+    required: false,
+    default: 'null'
+  })
+  updatedBy: string;
 }

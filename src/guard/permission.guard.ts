@@ -5,7 +5,7 @@ import { JwtSecret } from "src/config/environment";
 
 
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class PermissionGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     private jwtService: JwtService
@@ -15,8 +15,9 @@ export class RolesGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
 
-      const roles = this.reflector.get<string[]>('roles', context.getHandler());
-      if (!roles || roles.length === 0) return true;
+      const permission = this.reflector.get<string>('permission', context.getHandler());
+      if (!permission) return true;
+
 
       const request = context.switchToHttp().getRequest();
       const bearerToken = request?.headers?.authorization;
@@ -29,13 +30,14 @@ export class RolesGuard implements CanActivate {
         return false;
       }
 
-      const personal = this.jwtService.verify(token, {
+      const user = this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET,
       });
 
+
       // INFO: personal have on role exited in role.
-      request.person = personal;
-      return roles.includes(personal.role);
+      request.user = user;
+      return user?.permissions.includes(permission) || user?.permissions.includes('all');
     } catch (error) {
       return false;
     }

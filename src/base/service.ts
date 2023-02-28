@@ -23,6 +23,7 @@ export class BaseService<T extends any> {
   }
   async getAll(filter: FilterQuery<T>, options?: BaseQueryDto) {
     // INFO: Get All
+    console.log(options);
     let result = this.model.find({ isDeleted: false, ...filter });
     let total = await this.model.count(filter);
     const limit = options.limit || 10;

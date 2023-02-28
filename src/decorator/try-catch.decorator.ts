@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 
-export const TryCatch = () => {
+export const TryCatch = (): MethodDecorator => {
   return function(
     target: any,
     propertyKey: string,
@@ -13,7 +13,6 @@ export const TryCatch = () => {
         return await originalMethod.apply(this, args);
       } catch (error) {
         if (error.status) throw error;
-        console.log(error)
         throw new InternalServerErrorException(error.message);
       }
     };

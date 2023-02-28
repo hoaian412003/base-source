@@ -5,7 +5,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { getMongoUrl } from './config/environment';
-import { RolesGuard } from './guard/role.guard';
+import { PermissionGuard } from './guard/permission.guard';
+import { RoleModule } from './modules/role/role.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -17,18 +18,26 @@ import { UserModule } from './modules/user/user.module';
     }),
 
     // Config mongoose
-    MongooseModule.forRoot(getMongoUrl()),
+    MongooseModule.forRoot(getMongoUrl(), {
+      connectionFactory: (connection) => {
+        connection.plugin(require('mongoose-autopopulate'));
+        return connection;
+      }
+    }),
 
     // Config Passport, Jwt
     PassportModule,
-    JwtModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET
+    }),
 
     // Another module
-    UserModule
+    UserModule,
+    RoleModule
   ],
   controllers: [],
   providers: [
-    { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_GUARD, useClass: PermissionGuard },
   ],
 })
 export class AppModule { }

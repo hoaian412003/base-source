@@ -1,5 +1,5 @@
 import { applyDecorators, Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common"
-import { ApiBearerAuth, ApiParam, ApiProperty, ApiQuery, ApiTags } from "@nestjs/swagger"
+import { ApiBearerAuth, ApiBody, ApiParam, ApiProperty, ApiQuery, ApiTags } from "@nestjs/swagger"
 import { BaseDocumentType } from "mongoose"
 import { Role } from "src/config/role"
 import { Permission, Roles } from "src/decorator/role.decorator"
@@ -19,7 +19,7 @@ export const DefaultPost = (route: string) => {
 export const DefaultGet = (route: string) => {
   return applyDecorators(
     TryCatch,
-    ApiBearerAuth,
+    ApiBearerAuth(),
     Get(route),
   )
 }
@@ -45,10 +45,10 @@ export const BaseController = <T>(route: string, Dto: any) => {
 
   const selfParam = ':' + route + "Id";
 
-  const writePermission = `Write${route.toLocaleUpperCase()}`;
-  const viewPermission = `View${route.toLocaleUpperCase()}`;
-  const editPermission = `Edit${route.toLocaleUpperCase()}`;
-  const removePermission = `Remove${route.toLocaleUpperCase()}`;
+  const writePermission = `write_${route.toLowerCase()}`;
+  const viewPermission = `view_${route.toLowerCase()}`;
+  const editPermission = `edit_${route.toLowerCase()}`;
+  const removePermission = `remove_${route.toLowerCase()}`;
 
   @Controller(route)
   abstract class BaseControllerClass {
@@ -56,7 +56,7 @@ export const BaseController = <T>(route: string, Dto: any) => {
 
     @DefaultPost('')
     @Permission(writePermission)
-    @ApiProperty({
+    @ApiBody({
       type: Dto
     })
     async create(@Body() data: T) {
@@ -79,7 +79,8 @@ export const BaseController = <T>(route: string, Dto: any) => {
       type: BaseQueryDto
     })
     async getAll(@Query() query: BaseQueryDto) {
-      return this.service.getAll({}, query);
+      console.log(query);
+      return await this.service.getAll({}, query);
     }
 
     @DefaultPut(selfParam)
