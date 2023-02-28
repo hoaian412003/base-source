@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
+import { InternalServerErrorException } from '@nestjs/common';
 
 export const TryCatch = (): MethodDecorator => {
   return function(
@@ -13,6 +13,7 @@ export const TryCatch = (): MethodDecorator => {
         return await originalMethod.apply(this, args);
       } catch (error) {
         if (error.status) throw error;
+        console.log('error');
         throw new InternalServerErrorException(error.message);
       }
     };

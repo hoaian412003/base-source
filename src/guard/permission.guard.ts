@@ -1,7 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
-import { JwtSecret } from "src/config/environment";
 
 
 @Injectable()
@@ -33,7 +32,6 @@ export class PermissionGuard implements CanActivate {
       const user = this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET,
       });
-
 
       // INFO: personal have on role exited in role.
       request.user = user;

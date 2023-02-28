@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { MESSAGES } from "@nestjs/core/constants";
 import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from "@nestjs/mongoose";
-import { compare } from "bcrypt";
+import { compare, compareSync } from "bcrypt";
 import { Model } from "mongoose";
 import { BaseService } from "src/base/service";
 import { Messages } from "src/config/messages";
@@ -30,7 +30,7 @@ export class UserService extends BaseService<UserDocument> {
 
   async login(data: LoginUserDto) {
     let user: UserDocument & { permissions: Array<string> } = await this.userModel.findOne({ username: data.username })
-    if (!user || !compare(data.password, user.password)) {
+    if (!user || !compareSync(data.password, user.password)) {
       throw new BadRequestException(Messages.FIELD_INVALID('Username', 'password'));
     }
     user = user.toObject() as any;

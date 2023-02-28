@@ -23,23 +23,24 @@ export class BaseService<T extends any> {
   }
   async getAll(filter: FilterQuery<T>, options?: BaseQueryDto) {
     // INFO: Get All
-    console.log(options);
     let result = this.model.find({ isDeleted: false, ...filter });
     let total = await this.model.count(filter);
     const limit = options.limit || 10;
     const skip = (options.page - 1) * limit || 0;
-    const sortBys = options.sortBy.split(',');
-    const sortDirections = options.sortDirection.split(',').map(Number);
+    const sortBys = (options?.sortBy || '').split(',');
+    const sortDirections = (options?.sortDirection || '').split(',').map(Number);
     result.limit(limit);
     result.skip(skip);
     sortBys.map((sortBy: string, index: number) => {
       if (index >= sortDirections.length) return;
       const sortDirection = sortDirections[index] === 1 ? 1 : -1;
-      result.sort({
-        [sortBy]: sortDirection
-      })
+      if (sortBy) {
+        result.sort({
+          [sortBy]: sortDirection
+        })
+      }
     })
-    return { result, total };
+    return { result: await result, total };
   }
 
   // NOTE: Update

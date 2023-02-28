@@ -1,18 +1,22 @@
 import { applyDecorators, Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common"
-import { ApiBearerAuth, ApiBody, ApiParam, ApiProperty, ApiQuery, ApiTags } from "@nestjs/swagger"
-import { BaseDocumentType } from "mongoose"
-import { Role } from "src/config/role"
-import { Permission, Roles } from "src/decorator/role.decorator"
+import { ApiBearerAuth, ApiBody, ApiParam } from "@nestjs/swagger"
+import { Permission } from "src/decorator/role.decorator"
 import { TryCatch } from "src/decorator/try-catch.decorator"
-import { CreateUserDto } from '../modules/user/dto/create-user.dto'
 import { BaseQueryDto } from "./query"
 import { BaseService } from "./service"
+
+export type ControllerConfig = {
+  route: string;
+  CreateDto?: any;
+  UpdateDto?: any;
+  QueryDto?: any;
+}
 
 export const DefaultPost = (route: string) => {
   return applyDecorators(
     TryCatch,
     Post(route),
-    ApiBearerAuth,
+    ApiBearerAuth(),
   )
 }
 
@@ -27,7 +31,7 @@ export const DefaultGet = (route: string) => {
 export const DefaultPut = (route: string) => {
   return applyDecorators(
     TryCatch,
-    ApiBearerAuth,
+    ApiBearerAuth(),
     Put(route),
   )
 }
@@ -35,18 +39,19 @@ export const DefaultPut = (route: string) => {
 export const DefaultDelete = (route: string) => {
   return applyDecorators(
     TryCatch,
-    ApiBearerAuth,
+    ApiBearerAuth(),
     Delete(route),
   )
 }
 
 
-export const BaseController = <T>(route: string, Dto: any) => {
+export const BaseController = <T>({ route, CreateDto, UpdateDto, QueryDto = {} }: ControllerConfig) => {
 
-  const selfParam = ':' + route + "Id";
+  const selfParam: string = route + "Id";
 
   const writePermission = `write_${route.toLowerCase()}`;
-  const viewPermission = `view_${route.toLowerCase()}`;
+  const viewOnePermission = `view_one_${route.toLowerCase()}`;
+  const viewAllPermission = `view_all_${route.toLowerCase()}`;
   const editPermission = `edit_${route.toLowerCase()}`;
   const removePermission = `remove_${route.toLowerCase()}`;
 
@@ -57,40 +62,39 @@ export const BaseController = <T>(route: string, Dto: any) => {
     @DefaultPost('')
     @Permission(writePermission)
     @ApiBody({
-      type: Dto
+      type: CreateDto
     })
-    async create(@Body() data: T) {
+    async create(@Body() data: any) {
       return await this.service.createOne(data);
     }
 
-    @DefaultGet(selfParam)
-    @Permission(viewPermission)
+    @DefaultGet('')
+    @Permission(viewAllPermission)
+    async getAll(@Query() query: BaseQueryDto) {
+      return await this.service.getAll({}, query);
+    }
+
+    @DefaultGet(`:${selfParam}`)
+    @Permission(viewOnePermission)
     @ApiParam({
       name: selfParam,
       required: true
     })
     async getOne(@Param() params: any) {
-      return this.service.getOne(params);
+      return await this.service.getOne({ _id: params[selfParam] });
     }
 
-    @DefaultGet('/all')
-    @Permission(viewPermission)
-    @ApiQuery({
-      type: BaseQueryDto
-    })
-    async getAll(@Query() query: BaseQueryDto) {
-      console.log(query);
-      return await this.service.getAll({}, query);
-    }
-
-    @DefaultPut(selfParam)
+    @DefaultPut(`:${selfParam}`)
     @Permission(editPermission)
     @ApiParam({
       name: selfParam,
       required: true
     })
+    @ApiBody({
+      type: UpdateDto
+    })
     async updateOne(@Param() params: any, @Body() data: T) {
-      return this.service.updateOne(params, data)
+      return this.service.updateOne({ _id: params[selfParam] }, data)
     }
 
     @DefaultDelete('soft/' + selfParam)

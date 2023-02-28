@@ -8,7 +8,10 @@ import { UserService } from "./user.service";
 
 @Controller('user')
 @ApiTags('User')
-export class UserController extends BaseController<UserDocument>('user', User) {
+export class UserController extends BaseController<UserDocument>({
+  route: 'user',
+  CreateDto: CreateUserDto
+}) {
 
   constructor(private userService: UserService) {
     super(userService);

@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { getMongoUrl } from './config/environment';
 import { PermissionGuard } from './guard/permission.guard';
+import { ImageModule } from './modules/image/image.module';
 import { RoleModule } from './modules/role/role.module';
 import { UserModule } from './modules/user/user.module';
 
@@ -33,7 +34,8 @@ import { UserModule } from './modules/user/user.module';
 
     // Another module
     UserModule,
-    RoleModule
+    RoleModule,
+    ImageModule
   ],
   controllers: [],
   providers: [

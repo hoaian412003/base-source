@@ -1,3 +1,5 @@
+import { join } from "path";
+
 export const getMongoUrl = () => {
   let mongoUrl = '';
   if (process.env.MONGO_USERNAME && process.env.MONGO_PASSWORD) {
@@ -9,3 +11,4 @@ export const getMongoUrl = () => {
 };
 
 export const JwtSecret = process.env.JWT_SECRET;
+export const rootPublicPath = join(__dirname, '../../', 'file')
